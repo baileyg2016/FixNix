@@ -1,9 +1,4 @@
 import os
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
-from slack_sdk.socket_mode import SocketModeClient
-from slack_sdk.socket_mode.request import SocketModeRequest
-from slack_sdk.socket_mode.response import SocketModeResponse
 from dotenv import load_dotenv
 
 from slack_bolt import App
