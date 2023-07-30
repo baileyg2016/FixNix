@@ -18,7 +18,7 @@ app = App(
 repo = Repo('https://api.github.com/repos/baileyg2016/finTracker/contents')
 files = repo.load_files()
 
-claude = Claude()
+claude = Claude(files)
 
 @app.command("/webhook")
 def hello_command(ack, body):
@@ -37,6 +37,7 @@ def message_hello(message, say):
 def fix_bug(message, say):
     print('receiving bug message')
     bug_context = message['text']
+    print('the bug context', bug_context)
     for file, code in files.items():
         bug, solution, explanation, steps = claude.find_bug_in_code(code, bug_context)
         if bug:
