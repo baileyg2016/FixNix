@@ -20,7 +20,8 @@ class Claude:
           file_contents = SubElement(xml_file, 'contents')
           file_contents.text = code
 
-      return self.prettify(xml_files)
+      return xml_files
+      # return self.prettify(xml_files)
 
     @staticmethod
     def prettify(elem):
