@@ -2,7 +2,7 @@ import os
 import requests
 import base64
 
-class GitHubRepo:
+class Repo:
     def __init__(self, repo_url, token=os.getenv('GITHUB_TOKEN')):
         self.repo_url = repo_url
         self.headers = {

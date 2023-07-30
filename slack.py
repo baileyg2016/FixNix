@@ -1,10 +1,11 @@
 import os
 from dotenv import load_dotenv
-
+load_dotenv()
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-load_dotenv()
+from claude import Claude
+from github import Repo
 
 # Install the Slack app and get xoxb- token in advance
 app = App(token=os.getenv("SLACK_BOT_TOKEN"))
@@ -13,6 +14,11 @@ app = App(
     token=os.getenv("SLACK_BOT_TOKEN"),
     signing_secret=os.getenv("SLACK_SIGNING_SECRET")
 )
+
+repo = Repo('https://api.github.com/repos/baileyg2016/finTracker/contents')
+files = repo.load_files()
+
+claude = Claude()
 
 @app.command("/webhook")
 def hello_command(ack, body):
@@ -30,7 +36,13 @@ def message_hello(message, say):
 @app.message("bug")
 def fix_bug(message, say):
     print('receiving bug message')
-    say(text="I will fix it!")
+    bug_context = message['text']
+    for file, code in files.items():
+        bug, solution, explanation, steps = claude.find_bug_in_code(code, bug_context)
+        if bug:
+            say(text=f"Found a bug in {file}. Solution: {solution}. Explanation: {explanation}.")
+            return
+    say(text="No bugs found.")
 
 @app.event("app_mention")
 def event_test(body, say):

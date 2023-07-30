@@ -1,13 +1,33 @@
 import os
-from dotenv import load_dotenv
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import fromstring, Element, SubElement, tostring
+from xml.dom import minidom
 
 anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 class Claude:
-    def __init__(self):
+    def __init__(self, files):
         self.anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.files = self.convert_files_to_xml(files)
+
+    def convert_files_to_xml(self, files):
+      xml_files = Element('files')
+
+      for file, code in files.items():
+          xml_file = SubElement(xml_files, 'file')
+          file_name = SubElement(xml_file, 'name')
+          file_name.text = file
+          file_contents = SubElement(xml_file, 'contents')
+          file_contents.text = code
+
+      return self.prettify(xml_files)
+
+    @staticmethod
+    def prettify(elem):
+        """Return a pretty-printed XML string for the Element."""
+        rough_string = tostring(elem, 'utf-8')
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="  ")
 
     def create_bug_prompt(self, code, context):
       return f"""
@@ -51,9 +71,9 @@ class Claude:
       """
 
     def string_to_xml(self, string):
-        return ET.fromstring(f'<root>{string}</root>')
+        return fromstring(f'<root>{string}</root>')
     
-    def break_into_tags(output):
+    def break_into_tags(self, output):
       root = self.string_to_xml(output)
       bug = root.find('bug') != None if root.find('bug').text else None
       solution = root.find('solution').text
@@ -70,6 +90,6 @@ class Claude:
         )
         return completion.completion
 
-claude = Claude()
-claude_output = claude.find_bug_in_code("def add_numbers(a, b):\n  result = a + c\n  return result\n\nprint(add_numbers(5, 3))", "The bug is in the add_numbers function")
-print(claude_output)
+# claude = Claude()
+# claude_output = claude.find_bug_in_code("def add_numbers(a, b):\n  result = a + c\n  return result\n\nprint(add_numbers(5, 3))", "The bug is in the add_numbers function")
+# print(claude_output)
