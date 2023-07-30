@@ -11,7 +11,7 @@ class Claude:
         self.files = self.convert_files_to_xml(files)
 
     def convert_files_to_xml(self, files):
-      xml_files = Element('files')
+      xml_files = Element('code')
 
       for file, code in files.items():
           xml_file = SubElement(xml_files, 'file')
@@ -37,6 +37,9 @@ class Claude:
           You are a an AI model tasked with finding bugs in a codebase. 
           You will be given the details of the bug in <bug></bug> tags.
           You will be given the codebase in <code></code> tags.
+          Inside the code tags will be a list of files in <file></file> tags.
+          Inside the file tags will be the name of the file in <name></name> tags.
+          Inside the file tags will be the contents of the file in <contents></contents> tags.
           The context about what bug you are looking for will be in <context></context> tags.
           Do your best to find the bug!
           If you don't know, say you cannot find the bug and then create
@@ -52,10 +55,7 @@ class Claude:
           {context}
           </context>
           
-          <code>
           {code}
-          </code>
-
 
           Okay go!
           {AI_PROMPT}

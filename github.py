@@ -20,7 +20,8 @@ class Repo:
         file_contents = {}
 
         for file in files:
-            if file['type'] == 'file' and [file['name'].endswith(ext) for ext in ['.py', '.js', '.ts', '.css']].count(True) > 0:
+            # right now not going to worry about styling files
+            if file['type'] == 'file' and [file['name'].endswith(ext) for ext in ['.py', '.js', '.ts']].count(True) > 0:
                 file_response = requests.get(file['url'], headers=self.headers)
                 file_content = self.decode_file(file_response.json())
                 file_contents[file['path']] = file_content
